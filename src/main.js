@@ -1,9 +1,8 @@
 import { Client, Users } from 'node-appwrite';
+import { urlData } from './function/getUrlData.js';
+import { fetchData } from './function/fetchData.js';
 
-// This Appwrite function will be executed every time your function is triggered
 export default async ({ req, res, log, error }) => {
-  // You can use the Appwrite SDK to interact with other services
-  // For this example, we're using the Users service
   const client = new Client()
     .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
     .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
@@ -12,24 +11,33 @@ export default async ({ req, res, log, error }) => {
 
   try {
     const response = await users.list();
-    // Log messages and errors to the Appwrite Console
-    // These logs won't be seen by your end users
     log(`Total users: ${response.total}`);
-  } catch(err) {
-    error("Could not list users: " + err.message);
+  } catch (err) {
+    error('Could not list users: ' + err.message);
   }
 
-  // The req object contains the request data
-  if (req.path === "/ping") {
-    // Use res object to respond with text(), json(), or binary()
-    // Don't forget to return a response!
-    return res.text("Pong");
+  if (req.path === '/fetch') {
+    const day = new Date().toLocaleString('en-US', { weekday: 'long' });
+    const urls = await urlData(day);
+    // console.log(urls);
+    if (day === 'Saturday' || day === 'Sunday') {
+      return res.json({
+        success: false,
+        message: 'Data is not available on weekends',
+      });
+    }
+    await fetchData(urls).catch((err) => {
+      console.log(err.message);
+      // process.exit(1);
+    });
+    return res.json({
+      success: true,
+      message: 'Data successfully scraped and saved to data.txt',
+    });
   }
 
   return res.json({
-    motto: "Build like a team of hundreds_",
-    learn: "https://appwrite.io/docs",
-    connect: "https://appwrite.io/discord",
-    getInspired: "https://builtwith.appwrite.io",
+    success: true,
+    message: 'Hello from NSE Automation Function!',
   });
 };
