@@ -26,12 +26,12 @@ export default async ({ req, res, log, error }) => {
     });
     return res.json({
       success: true,
-      message: 'Data successfully scraped and saved to data.txt',
+      message: 'Data successfully scraped and saved to data.txt!',
     });
   }
 
   return res.json({
     success: true,
-    message: 'Hello from NSE Automation Function!',
+    message: 'Hello! from NSE Automation Function!',
   });
 };
