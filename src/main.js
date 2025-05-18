@@ -19,13 +19,7 @@ export default async ({ req, res, log, error }) => {
   if (req.path === '/fetch') {
     const day = new Date().toLocaleString('en-US', { weekday: 'long' });
     const urls = await urlData(day);
-    // console.log(urls);
-    // if (day === 'Saturday' || day === 'Sunday') {
-    //   return res.json({
-    //     success: false,
-    //     message: 'Data is not available on weekends',
-    //   });
-    // }
+    console.log(urls);
     await fetchData(urls).catch((err) => {
       console.log(err.message);
       // process.exit(1);
