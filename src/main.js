@@ -20,12 +20,12 @@ export default async ({ req, res, log, error }) => {
     const day = new Date().toLocaleString('en-US', { weekday: 'long' });
     const urls = await urlData(day);
     // console.log(urls);
-    if (day === 'Saturday' || day === 'Sunday') {
-      return res.json({
-        success: false,
-        message: 'Data is not available on weekends',
-      });
-    }
+    // if (day === 'Saturday' || day === 'Sunday') {
+    //   return res.json({
+    //     success: false,
+    //     message: 'Data is not available on weekends',
+    //   });
+    // }
     await fetchData(urls).catch((err) => {
       console.log(err.message);
       // process.exit(1);
