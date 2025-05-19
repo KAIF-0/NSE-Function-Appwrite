@@ -28,3 +28,19 @@ export default async ({ req, res, log, error }) => {
     message: 'Data successfully scraped and saved to Spreadsheet!',
   });
 };
+
+// for testing locally
+
+// (async () => {
+//   const day = new Date().toLocaleString('en-US', { weekday: 'long' });
+//   const urls = await urlData(day);
+//   console.log(urls);
+//   await fetchData(urls)
+//     .then(() => {
+//       console.log('Data successfully scraped and saved to Spreadsheet!');
+//     })
+//     .catch((err) => {
+//       console.log(err.message);
+//       // process.exit(1);
+//     });
+// })();
