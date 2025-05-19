@@ -21,7 +21,7 @@ export async function uploadCSVToGoogleSheet(
     const client = await auth.getClient();
     const sheets = google.sheets({ version: "v4", auth: client });
 
-    log(records.length, sheetName);
+    console.log(records.length, sheetName);
 
     const symbols = records
       .slice(1)
@@ -70,7 +70,7 @@ export async function uploadCSVToGoogleSheet(
       });
     }
 
-    log("CSV Uploaded to Google Sheet successfully!");
+    console.log("CSV Uploaded to Google Sheet successfully!");
   } catch (error) {
     error("Error uploading CSV to Google Sheet:", error.message);
   }
