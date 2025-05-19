@@ -1,5 +1,5 @@
 export const filterCSVData = (rows, fileName) => {
-  // console.log(rows, fileName);
+  // log(rows, fileName);
   if (fileName.split(".")[0].toLowerCase().includes("decline")) {
     return rows.filter((row) => row["Series "] === "EQ");
   }

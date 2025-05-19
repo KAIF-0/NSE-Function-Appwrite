@@ -5,7 +5,7 @@ import { config } from "dotenv";
 config();
 
 const CREDENTIALS = JSON.parse(process.env.NSE_GOOGLE_SPREADSHEET_CREDENTIALS);
-// console.log(CREDENTIALS);
+// log(CREDENTIALS);
 
 const auth = new google.auth.GoogleAuth({
   credentials: CREDENTIALS,
@@ -21,7 +21,7 @@ export async function uploadCSVToGoogleSheet(
     const client = await auth.getClient();
     const sheets = google.sheets({ version: "v4", auth: client });
 
-    console.log(records.length, sheetName);
+    log(records.length, sheetName);
 
     const symbols = records
       .slice(1)
@@ -70,15 +70,15 @@ export async function uploadCSVToGoogleSheet(
       });
     }
 
-    console.log("CSV Uploaded to Google Sheet successfully!");
+    log("CSV Uploaded to Google Sheet successfully!");
   } catch (error) {
-    console.error("Error uploading CSV to Google Sheet:", error.message);
+    error("Error uploading CSV to Google Sheet:", error.message);
   }
 }
 
 async function getSheetIdByName(sheets, spreadsheetId, sheetName) {
   const res = await sheets.spreadsheets.get({ spreadsheetId });
   const sheet = res.data.sheets.find((s) => s.properties.title === sheetName);
-  // console.log(sheet?.properties?.sheetId);
+  // log(sheet?.properties?.sheetId);
   return sheet?.properties?.sheetId;
 }

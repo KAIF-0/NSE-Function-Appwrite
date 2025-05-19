@@ -19,9 +19,9 @@ export default async ({ req, res, log, error }) => {
   if (req.path === '/fetch') {
     const day = new Date().toLocaleString('en-US', { weekday: 'long' });
     const urls = await urlData(day);
-    console.log(urls);
+    log(urls);
     await fetchData(urls).catch((err) => {
-      console.log(err.message);
+      log(err.message);
       // process.exit(1);
     });
     return res.json({

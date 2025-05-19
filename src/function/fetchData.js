@@ -10,7 +10,7 @@ config();
 const GOOGLE_SHEET_ID = process.env.NSE_GOOGLE_SHEET_ID;
 
 const filterCSVData = async (rows, fileName) => {
-  // console.log(rows, fileName);
+  // log(rows, fileName);
   if (fileName.split(".")[0].toLowerCase().includes("decline")) {
     return await rows.filter((row) => {
       const change = parseFloat(row["%chng "]);
@@ -79,7 +79,7 @@ export const fetchData = async (urls) => {
       }, buttonId);
 
       if (csvUrl) {
-        console.log(`Downloading CSV from: ${csvUrl}`);
+        log(`Downloading CSV from: ${csvUrl}`);
         await page.click(`${buttonId}`);
 
         await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -92,7 +92,7 @@ export const fetchData = async (urls) => {
         });
 
         const filteredData = await filterCSVData(records, fileName);
-        // console.log(filteredData);
+        // log(filteredData);
 
         //writing filtered data back to file
         if (filteredData.length !== 0) {
@@ -136,7 +136,7 @@ const clearCsvFiles = async () => {
 
   try {
     const files = fs.readdirSync(downloadPath);
-    // console.log(files);
+    // log(files);
 
     for (const file of files) {
       if (file.endsWith(".csv")) {
