@@ -1,33 +1,33 @@
-import puppeteer from "puppeteer"; 
-import fs from "fs";
-import path from "path";
-import { parse } from "csv-parse/sync";
-import { uploadCSVToGoogleSheet } from "./csvUpload.js";
-import { config } from "dotenv";
-import { exit } from "process";
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
+import { parse } from 'csv-parse/sync';
+import { uploadCSVToGoogleSheet } from './csvUpload.js';
+import { config } from 'dotenv';
+import { exit } from 'process';
 config();
 
 const GOOGLE_SHEET_ID = process.env.NSE_GOOGLE_SHEET_ID;
 
 const filterCSVData = async (rows, fileName) => {
   // console.log(rows, fileName);
-  if (fileName.split(".")[0].toLowerCase().includes("decline")) {
+  if (fileName.split('.')[0].toLowerCase().includes('decline')) {
     return await rows.filter((row) => {
-      const change = parseFloat(row["%chng "]);
-      const series = row["Series "];
-      return series.includes("EQ") && change < -8;
+      const change = parseFloat(row['%chng ']);
+      const series = row['Series '];
+      return series.includes('EQ') && change < -8;
     });
   }
 
-  if (fileName.split(".")[0].toLowerCase().includes("advance")) {
+  if (fileName.split('.')[0].toLowerCase().includes('advance')) {
     return await rows.filter((row) => {
-      const change = parseFloat(row["%chng "]);
-      const series = row["Series "];
+      const change = parseFloat(row['%chng ']);
+      const series = row['Series '];
       if (!change || isNaN(change)) return false;
 
       return (
-        (series === "EQ" && change > 4) ||
-        (["BE", "SM", "ST"].includes(series) && change > 4)
+        (series === 'EQ' && change > 4) ||
+        (['BE', 'SM', 'ST'].includes(series) && change > 4)
       );
     });
   }
@@ -40,27 +40,32 @@ export const fetchData = async (urls) => {
     const browser = await puppeteer.launch({
       headless: true,
       args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-blink-features=AutomationControlled",
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--disable-extensions',
+        '--single-process',
+        '--no-zygote',
       ],
       protocolTimeout: 300000,
     });
 
     const page = await browser.newPage();
 
-    const downloadPath = path.resolve("./downloads");
-    await page._client().send("Page.setDownloadBehavior", {
-      behavior: "allow",
+    const downloadPath = path.resolve('./downloads');
+    await page._client().send('Page.setDownloadBehavior', {
+      behavior: 'allow',
       downloadPath: downloadPath,
     });
 
     await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     );
 
     await page.setExtraHTTPHeaders({
-      "Accept-Language": "en-US,en;q=0.9",
+      'Accept-Language': 'en-US,en;q=0.9',
     });
 
     //clearing files to prevent
@@ -69,7 +74,7 @@ export const fetchData = async (urls) => {
     for (const singleUrlData of urls) {
       const { url, buttonId, fileName, sheetName } = singleUrlData;
 
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
       await page.waitForSelector(`${buttonId}`, { timeout: 60000 });
 
@@ -85,7 +90,7 @@ export const fetchData = async (urls) => {
         await new Promise((resolve) => setTimeout(resolve, 5000));
 
         const filePath = path.join(downloadPath, fileName);
-        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
         const records = parse(fileContent, {
           columns: true,
           skip_empty_lines: true,
@@ -96,16 +101,16 @@ export const fetchData = async (urls) => {
 
         //writing filtered data back to file
         if (filteredData.length !== 0) {
-          if (fileName.split(".")[0] === "Advance") {
+          if (fileName.split('.')[0] === 'Advance') {
             for (const name of sheetName) {
               const data = await filteredData.filter((row) => {
-                const change = parseFloat(row["%chng "]);
-                const series = row["Series "];
+                const change = parseFloat(row['%chng ']);
+                const series = row['Series '];
                 if (!change || isNaN(change)) return false;
 
-                return name.includes("EQ")
-                  ? series === "EQ" && change > 4
-                  : ["BE", "SM", "ST"].includes(series) && change > 4;
+                return name.includes('EQ')
+                  ? series === 'EQ' && change > 4
+                  : ['BE', 'SM', 'ST'].includes(series) && change > 4;
               });
               const headers = Object.keys(data[0]);
               const values = data.map((row) => headers.map((key) => row[key]));
@@ -132,16 +137,16 @@ export const fetchData = async (urls) => {
 };
 
 const clearCsvFiles = async () => {
-  const downloadPath = path.join(process.cwd(), "downloads");
+  const downloadPath = path.join(process.cwd(), 'downloads');
 
   try {
     const files = fs.readdirSync(downloadPath);
     // console.log(files);
 
     for (const file of files) {
-      if (file.endsWith(".csv")) {
+      if (file.endsWith('.csv')) {
         const filePath = path.join(downloadPath, file);
-        fs.writeFileSync(filePath, "", "utf-8");
+        fs.writeFileSync(filePath, '', 'utf-8');
       }
     }
   } catch (error) {
