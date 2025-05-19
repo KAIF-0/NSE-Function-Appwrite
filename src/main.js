@@ -16,22 +16,15 @@ export default async ({ req, res, log, error }) => {
     error('Could not list users: ' + err.message);
   }
 
-  if (req.path === '/fetch') {
-    const day = new Date().toLocaleString('en-US', { weekday: 'long' });
-    const urls = await urlData(day);
-    log(urls);
-    await fetchData(urls).catch((err) => {
-      log(err.message);
-      // process.exit(1);
-    });
-    return res.json({
-      success: true,
-      message: 'Data successfully scraped and saved to data.txt!',
-    });
-  }
-
+  const day = new Date().toLocaleString('en-US', { weekday: 'long' });
+  const urls = await urlData(day);
+  log(urls);
+  await fetchData(urls).catch((err) => {
+    log(err.message);
+    // process.exit(1);
+  });
   return res.json({
     success: true,
-    message: 'Hello! from NSE Automation Function!',
+    message: 'Data successfully scraped and saved to Spreadsheet!',
   });
 };
